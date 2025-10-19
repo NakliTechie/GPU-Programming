@@ -1,0 +1,1 @@
+This section provides a practical example of vector addition in CUDA, demonstrating the full workflow from data preparation to kernel execution and result verification. It also introduces the concept of thread hierarchy for parallel computation.

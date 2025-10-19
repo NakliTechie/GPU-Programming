@@ -1,0 +1,1 @@
+This section explores the CUDA execution model in more detail, using `printf` from within a kernel to visualize thread execution and control divergence. It also introduces the concepts of warps and latency hiding.

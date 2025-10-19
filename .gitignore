@@ -1,0 +1,4 @@
+# Ignore files and directories that should not be committed
+AGENTS.md
+QWEN.md
+docs/

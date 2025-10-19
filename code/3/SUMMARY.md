@@ -1,0 +1,1 @@
+This section demonstrates a naive implementation of matrix multiplication, introducing the use of a 2D thread grid to solve 2D problems. It reinforces the concept of mapping a 2D problem to the CUDA execution model.

@@ -1,0 +1,1 @@
+This section introduces the fundamental concepts of CUDA programming, outlining the interaction between the host (CPU) and the device (GPU).
