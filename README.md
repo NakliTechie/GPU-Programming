@@ -20,7 +20,6 @@ The `mmx.md` files in each of the `code` subdirectories contain my mental models
    ```bash
    leetgpu run code/your_file.cu  # Runs in functional mode by default
    ```
-3. When I say to run a specific file, I will execute the leetgpu command with that file so you can see the output and any errors that occur
 
 ## About leetgpu
 leetgpu is a cloud-based GPU service that we use via its playground and CLI to test and iterate on the code. It provides:
