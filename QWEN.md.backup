@@ -1,0 +1,115 @@
+# CUDA Programming Experiments with leetgpu
+
+## Project Overview
+
+This is a CUDA programming learning project that utilizes leetgpu, a cloud GPU service that emulates GPUs on CPUs using open-source simulators. This allows CUDA development and testing on systems without NVIDIA GPU hardware (like Mac laptops), making GPU programming accessible without specialized hardware.
+
+## Project Structure
+
+- `/code` - CUDA source files for experiments
+- `/docs` - Comprehensive documentation for CUDA development with leetgpu
+- `README.md` - Project overview
+- `QWEN.md` - This file (instructional context)
+
+## Documentation Files
+
+- `docs/README.md` - Complete guidelines for CUDA development with leetgpu
+- `docs/quick_reference.md` - Quick reference for common leetgpu commands
+- `docs/troubleshooting.md` - Solutions to common issues and limitations
+- `docs/example_vector_add.cu` - Working CUDA example demonstrating functionality
+- `docs/SUMMARY.md` - Project summary
+
+## leetgpu Service Capabilities
+
+### Simulation Modes
+- **Functional Mode**: Fast simulation for correctness testing (CUDA 11.7)
+  - Ideal for testing program logic and debugging
+  - Default mode when running CUDA files
+- **Cycle-Accurate Mode**: Detailed architectural simulation (CUDA 11.8)
+  - Provides performance insights by modeling GPU hardware cycle-by-cycle
+  - Slower but helps predict actual GPU performance
+  - Requires specifying a GPU model with the `--gpu` flag
+
+### Available GPU Models
+- NVIDIA GTX TITAN X
+- NVIDIA GV100
+- NVIDIA QV100
+- NVIDIA TITAN V
+- NVIDIA RTX 2060 Super
+- NVIDIA RTX 3070
+
+### Supported CUDA Features
+- Constant memory
+- Global memory
+- Shared memory
+- CUDA Streams
+- CUDA Events
+- Atomic operations
+
+### Current Limitations
+- Texture memory (not supported)
+- Dynamic parallelism (not supported)
+- CUDA Graphs (not supported)
+- Warp-level primitives (shuffle, vote, etc.) (not supported)
+
+## Command Usage
+
+### Running CUDA Files
+```bash
+# Run in functional mode (default)
+leetgpu run kernel.cu
+
+# Explicitly run in functional mode
+leetgpu run kernel.cu --mode functional
+
+# Run in cycle-accurate mode
+leetgpu run kernel.cu --mode cycle-accurate --gpu "NVIDIA GV100"
+```
+
+### Other Useful Commands
+```bash
+# Check CUDA versions for each mode
+leetgpu cuda-version --mode functional
+leetgpu cuda-version --mode cycle-accurate
+
+# List available GPU models
+leetgpu list-gpus
+```
+
+## Development Workflow
+
+1. On load, I will take stock of all files in the `code` folder, as we will be referring to them.
+2. Write CUDA code in `.cu` files in the `/code` directory
+3. Test functionality using functional mode: `leetgpu run code/your_file.cu`
+4. Before pushing any new `.cu` file, ensure the filename matches the one mentioned in the first line of the file. If they differ, automatically rename the file to match the name in the file content.
+5. When you ask me to run a specific file (e.g., "run x.cu"), I will execute the leetgpu command with that file so you can see the output and any errors that occur
+6. When asked to explain code, always provide an ELI5 (Explain Like I'm 5) explanation.
+7. Analyze performance with specific GPU models using cycle-accurate mode
+8. Refer to documentation in `/docs` for best practices and troubleshooting
+
+## Example Code
+
+The project includes a working vector addition example in `docs/example_vector_add.cu` that demonstrates:
+- Memory allocation on device and host
+- Kernel execution
+- Memory transfers between host and device
+- Proper CUDA error handling and synchronization
+
+This example has been tested and works correctly in both simulation modes.
+
+## Best Practices
+
+1. Start with functional mode for development and debugging
+2. Use cycle-accurate mode for performance analysis
+3. Test across multiple GPU models for comprehensive analysis
+4. Avoid unsupported CUDA features
+5. Check CUDA versions (11.7 functional, 11.8 cycle-accurate) when using newer features
+
+## Purpose
+
+This project is for learning and experimenting with CUDA programming concepts, including:
+- GPU architecture and parallel computing
+- CUDA kernel development
+- Memory management in GPU computing
+- Performance optimization techniques
+- GPU simulation vs. real hardware behavior

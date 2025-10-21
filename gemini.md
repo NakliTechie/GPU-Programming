@@ -12,12 +12,13 @@ Here's a quick summary of the key aspects:
     *   **Functional Mode:** For fast correctness checking (CUDA 11.7).
     *   **Cycle-Accurate Mode:** For detailed performance analysis on various simulated GPUs (CUDA 11.8).
 *   **Project Structure:** Your CUDA code is in the `/code` directory, and the documentation is in the `/docs` directory.
-*   **Workflow:** You can write CUDA code, and I can help you run it using `leetgpu`, analyze the output, and debug any issues. As a part of the workflow, before pushing any new `.cu` file, I will ensure that the filename is the same as the one mentioned in the first line of the file. If they differ, I will automatically rename the file to match the name in the file content.
+*   **Workflow:** On load, I will take stock of all files in the `code` folder, as we will be referring to them. You can write CUDA code, and I can help you run it using `leetgpu`, analyze the output, and debug any issues. As a part of the workflow, before pushing any new `.cu` file, I will ensure that the filename is the same as the one mentioned in the first line of the file. If they differ, I will automatically rename the file to match the name in the file content.
 
 ## How I Can Help
 
 I can assist you in the following ways:
 
+*   **Code Explanations:** When asked to explain code, always provide an ELI5 (Explain Like I'm 5) explanation.
 *   **Code Writing and Explanation:** I can write new CUDA kernels, explain existing code, and demonstrate various CUDA concepts like memory management, streams, and parallel programming patterns.
 *   **Running and Analyzing Code:** You can ask me to run any of your `.cu` files. I will use the `leetgpu` command, show you the output, and help you interpret the results, whether it's a successful run or an error.
 *   **Debugging and Optimization:** If your code has bugs or is not performing as expected, I can help you debug it. I can also suggest optimizations to improve performance, such as using shared memory or improving memory access patterns.
