@@ -88,7 +88,7 @@ void printMatrix(const std::vector<float>& M, int N, const std::string& name) {
 }
 
 int main() {
-    int W = 256, H = 256;
+    int W = 64, H = 64;
     size_t size = W * H * sizeof(float);
     
     std::vector<float> h_in(W*H), h_out_gpu(W*H), h_out_cpu(W*H);
