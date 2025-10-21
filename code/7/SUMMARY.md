@@ -25,12 +25,6 @@ An implementation using privatization where each thread block maintains its own 
 - Fails in cycle-accurate simulation mode due to synchronization/timing issues in the simulator
 This demonstrates the importance of testing in both functional and cycle-accurate simulation modes, as complex synchronization patterns can behave differently between them. The privatization approach is conceptually better for performance but more sensitive to timing differences in simulators.
 
-### `histogram.cu` - Simple Histogram Implementation (Primary)
-A simplified histogram implementation using direct atomic operations without privatization. This approach successfully works in both functional and cycle-accurate modes and is the recommended implementation.
-
-### `histogram_with_privatization.cu` - Histogram with Shared Memory Privatization
-An implementation using privatization with shared memory, where each thread block maintains its own private histogram before aggregating to the global result. This approach works correctly in functional mode but fails in cycle-accurate mode due to synchronization/timing issues in the simulator. This file demonstrates the importance of testing in both functional and cycle-accurate simulation modes, as complex synchronization patterns can behave differently between them.
-
 ### `learnings_cuda_stencil.md` - Technical Learnings
 A comprehensive document capturing the lessons learned from debugging and optimizing the CUDA stencil code, including:
 - Thread block dimension considerations
