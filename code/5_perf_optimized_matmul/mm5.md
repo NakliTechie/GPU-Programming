@@ -1,121 +1,35 @@
-// File: tiledMatMul.cu
-// Description: A complete and verifiable tiled matrix multiplication using shared memory.
-#include <iostream>
-#include <vector>
-#include <cuda_runtime.h>
-#include <cmath>
+// Mental Model 5.0
 
-// The width of the tiles. This must be a compile-time constant
-// and match the block dimensions.
-#define TILE_WIDTH 16
+// ... Host code ...
+my_tiled_kernel<<<gridDim, blockDim>>>(...);
 
-void checkCudaError(cudaError_t err, const char* message) {
-    if (err != cudaSuccess) {
-        std::cerr << "CUDA Error: " << message << " (" << cudaGetErrorString(err) << ")" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-}
+// ===================================
+// Device (GPU) Code
+// ===================================
+__global__ void my_tiled_kernel(float* global_A, ...) {
+  // 1. Define tiles in fast, on-chip shared memory
+  __shared__ float tile_A[...];
+  __shared__ float tile_B[...];
 
-// Tiled Matrix Multiplication Kernel using Shared Memory
-__global__ void tiledMatMul(const float* A, const float* B, float* C, int N) {
-    __shared__ float As[TILE_WIDTH][TILE_WIDTH];
-    __shared__ float Bs[TILE_WIDTH][TILE_WIDTH];
+  // 2. Loop over large global matrices in tile-sized steps
+  for (each tile_step) {
+    // 3. Cooperatively load one tile from slow global memory
+    //    into fast shared memory.
+    tile_A[...] = global_A[...];
+    tile_B[...] = global_B[...];
 
-    int tx = threadIdx.x; int ty = threadIdx.y;
-    int row = blockIdx.y * TILE_WIDTH + ty;
-    int col = blockIdx.x * TILE_WIDTH + tx;
+    // 4. BARRIER: Wait for ALL threads in the block to finish loading.
+    __syncthreads();
 
-    float sum = 0.0f;
-
-    for (int t = 0; t < N / TILE_WIDTH; t++) {
-        // Load a tile of A and B from global memory to shared memory
-        if (row < N && (t * TILE_WIDTH + tx) < N)
-            As[ty][tx] = A[row * N + (t * TILE_WIDTH + tx)];
-        else As[ty][tx] = 0.0f;
-
-        if ((t * TILE_WIDTH + ty) < N && col < N)
-            Bs[ty][tx] = B[(t * TILE_WIDTH + ty) * N + col];
-        else Bs[ty][tx] = 0.0f;
-
-        __syncthreads(); // Synchronize to make sure the tiles are loaded
-
-        // Multiply the tiles from shared memory
-        for (int k = 0; k < TILE_WIDTH; k++) {
-            sum += As[ty][k] * Bs[k][tx];
-        }
-        __syncthreads(); // Synchronize before loading the next tile
+    // 5. All threads process the loaded tiles using FAST reads from shared memory.
+    for (each element_in_tile) {
+      sum += tile_A[...] * tile_B[...];
     }
 
-    if (row < N && col < N) {
-        C[row * N + col] = sum;
-    }
-}
+    // 6. BARRIER: Wait for ALL threads to finish using the tiles.
+    __syncthreads();
+  }
 
-// Host function for CPU-based verification
-void cpuMatMul(const std::vector<float>& A, const std::vector<float>& B, std::vector<float>& C, int N) {
-    for (int row = 0; row < N; ++row) {
-        for (int col = 0; col < N; ++col) {
-            float sum = 0.0f;
-            for (int k = 0; k < N; ++k) {
-                sum += A[row * N + k] * B[k * N + col];
-            }
-            C[row * N + col] = sum;
-        }
-    }
-}
-
-void printMatrix(const std::vector<float>& M, int N, const std::string& name) {
-    std::cout << "--- Top-left 3x3 of " << name << " ---" << std::endl;
-    for (int i = 0; i < 3; ++i) {
-        for (int j = 0; j < 3; ++j) {
-            std::cout << M[i * N + j] << "\t";
-        }
-        std::cout << std::endl;
-    }
-}
-
-int main() {
-    int N = 256;
-    if (N % TILE_WIDTH != 0) { std::cerr << "Matrix size must be a multiple of TILE_WIDTH." << std::endl; return -1; }
-    size_t size = N * N * sizeof(float);
-    std::cout << "Tiled matrix multiplication for " << N << "x" << N << " matrices." << std::endl;
-
-    std::vector<float> h_A(N * N), h_B(N * N), h_C_gpu(N * N), h_C_cpu(N * N);
-
-    for (int i = 0; i < N * N; i++) {
-        h_A[i] = (float)(i / N);
-        h_B[i] = (float)(i % N);
-    }
-
-    float *d_A, *d_B, *d_C;
-    cudaMalloc(&d_A, size); cudaMalloc(&d_B, size); cudaMalloc(&d_C, size);
-
-    cudaMemcpy(d_A, h_A.data(), size, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_B, h_B.data(), size, cudaMemcpyHostToDevice);
-
-    dim3 threadsPerBlock(TILE_WIDTH, TILE_WIDTH);
-    dim3 numBlocks(N / TILE_WIDTH, N / TILE_WIDTH);
-
-    tiledMatMul<<<numBlocks, threadsPerBlock>>>(d_A, d_B, d_C, N);
-    cudaDeviceSynchronize();
-
-    cudaMemcpy(h_C_gpu.data(), d_C, size, cudaMemcpyDeviceToHost);
-
-    cpuMatMul(h_A, h_B, h_C_cpu, N);
-
-    printMatrix(h_C_gpu, N, "GPU Result");
-    printMatrix(h_C_cpu, N, "CPU Verification Result");
-
-    bool success = true;
-    for (int i = 0; i < N * N; i++) {
-        if (fabs(h_C_gpu[i] - h_C_cpu[i]) > 0.1) {
-            success = false;
-            break;
-        }
-    }
-    std::cout << (success ? "\nVerification Successful!" : "\nVerification FAILED!") << std::endl;
-
-    cudaFree(d_A); cudaFree(d_B); cudaFree(d_C);
-
-    return 0;
+  // 7. Write final result from registers to slow global memory.
+  global_C[...] = sum;
 }
